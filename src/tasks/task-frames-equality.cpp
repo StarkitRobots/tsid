@@ -136,8 +136,8 @@ TSID_DISABLE_WARNING_POP
     {
       return m_v_error_masked_vec;
     }
-
-    const Vector & TaskFramesEquality::position() const
+  
+    /*const Vector & TaskFramesEquality::position() const
     {
       return m_p;
     }
@@ -155,7 +155,7 @@ TSID_DISABLE_WARNING_POP
     const Vector & TaskFramesEquality::velocity_ref() const
     {
       return m_v_ref_vec;
-    }
+    }*/
 
     const Vector & TaskFramesEquality::getDesiredAcceleration() const
     {
@@ -192,19 +192,22 @@ TSID_DISABLE_WARNING_POP
                                                     ConstRefVector ,
                                                     Data & data)
     {
-      SE3 oMi;
-      Motion v_frame;
+      SE3 oMi, oMi2;
+      Motion v_frame, v_frame2;
       m_robot.framePosition(data, m_frame_id1, oMi);
+      m_robot.framePosition(data, m_frame_id1, oMi2);
       m_robot.frameVelocity(data, m_frame_id1, v_frame);
+      m_robot.frameVelocity(data, m_frame_id1, v_frame2);      
       m_robot.frameClassicAcceleration(data, m_frame_id1, m_drift);
 
       // @todo Since Jacobian computation is cheaper in world frame
       // we could do all computations in world frame
       m_robot.frameJacobianLocal(data, m_frame_id1, m_J);
+      //m_robot.frameJacobianLocal(data, m_frame_id2, m_J2);
 
       errorInSE3(oMi, m_M_ref, m_p_error);          // pos err in local frame
-      SE3ToVector(m_M_ref, m_p_ref);
-      SE3ToVector(oMi, m_p);
+      //SE3ToVector(m_M_ref, m_p_ref); 
+      //SE3ToVector(oMi, m_p);
 
       // Transformation from local to world
       m_wMl.rotation(oMi.rotation());
@@ -217,7 +220,7 @@ TSID_DISABLE_WARNING_POP
         m_a_des = m_Kp.cwiseProduct(m_p_error_vec)
                   + m_Kd.cwiseProduct(m_v_error.toVector())
                   + m_wMl.actInv(m_a_ref).toVector();
-      } else {
+      } /*else {
         m_p_error_vec = m_wMl.toActionMatrix() *   // pos err in local world-oriented frame
             m_p_error.toVector();
 
@@ -236,7 +239,7 @@ TSID_DISABLE_WARNING_POP
         // Use an explicit temporary `m_J_rotated` here to avoid allocations.
         m_J_rotated.noalias() = m_wMl.toActionMatrix() * m_J;
         m_J = m_J_rotated;
-      }
+      }*/
 
       m_v_error_vec = m_v_error.toVector();
       m_v_ref_vec = m_v_ref.toVector();

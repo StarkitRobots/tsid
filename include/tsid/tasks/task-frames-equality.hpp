@@ -88,10 +88,10 @@ namespace tsid
       */
       const Vector & velocity_error() const;
 
-      const Vector & position() const;
+      /*const Vector & position() const;
       const Vector & velocity() const;
       const Vector & position_ref() const;
-      const Vector & velocity_ref() const;
+      const Vector & velocity_ref() const;*/
 
       const Vector & Kp() const;
       const Vector & Kd() const;
