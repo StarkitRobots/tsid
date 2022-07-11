@@ -56,8 +56,9 @@ namespace tsid
       m_Kp.setZero(6);
       m_Kd.setZero(6);
       m_a_des.setZero(6);
-      m_J.setZero(6, robot.nv());
-      m_J_rotated.setZero(6, robot.nv());
+      m_J1.setZero(6, robot.nv());
+      m_J2.setZero(6, robot.nv());
+      //m_J_rotated.setZero(6, robot.nv());
 
       m_mask.resize(6);
       m_mask.fill(1.);
@@ -70,7 +71,7 @@ namespace tsid
     {
       TaskMotion::setMask(mask);
       int n = dim();
-      m_constraint.resize(n, (unsigned int)m_J.cols());
+      m_constraint.resize(n, (unsigned int)m_J1.cols());
       m_p_error_masked_vec.resize(n);
       m_v_error_masked_vec.resize(n);
       m_drift_masked.resize(n);
@@ -192,64 +193,42 @@ TSID_DISABLE_WARNING_POP
                                                     ConstRefVector ,
                                                     Data & data)
     {
-      SE3 oMi, oMi2;
-      Motion v_frame, v_frame2;
-      m_robot.framePosition(data, m_frame_id1, oMi);
-      m_robot.framePosition(data, m_frame_id1, oMi2);
-      m_robot.frameVelocity(data, m_frame_id1, v_frame);
-      m_robot.frameVelocity(data, m_frame_id1, v_frame2);      
+      SE3 oMi1, oMi2;
+      Motion v_frame1, v_frame2;
+      m_robot.framePosition(data, m_frame_id1, oMi1);
+      m_robot.framePosition(data, m_frame_id2, oMi2);
+      m_robot.frameVelocity(data, m_frame_id1, v_frame1);
+      m_robot.frameVelocity(data, m_frame_id2, v_frame2);      
       m_robot.frameClassicAcceleration(data, m_frame_id1, m_drift);
 
       // @todo Since Jacobian computation is cheaper in world frame
       // we could do all computations in world frame
-      m_robot.frameJacobianLocal(data, m_frame_id1, m_J);
-      //m_robot.frameJacobianLocal(data, m_frame_id2, m_J2);
+      m_robot.frameJacobianLocal(data, m_frame_id1, m_J1);
+      m_robot.frameJacobianLocal(data, m_frame_id2, m_J2);
 
-      errorInSE3(oMi, m_M_ref, m_p_error);          // pos err in local frame
-      //SE3ToVector(m_M_ref, m_p_ref); 
-      //SE3ToVector(oMi, m_p);
+      // ==== [Sol]: Exchanging ref to frame2 ====
+      //errorInSE3(oMi, m_M_ref, m_p_error);          // pos err in local frame
+      errorInSE3(oMi1, oMi2, m_p_error);          // pos err in local frame
 
-      // Transformation from local to world
-      m_wMl.rotation(oMi.rotation());
+      // Always working in local frame
+      m_p_error_vec = m_p_error.toVector();
+      //m_v_error =  m_wMl.actInv(m_v_ref) - v_frame;  // vel err in local frame
+      m_v_error =  v_frame2 - v_frame1;  // vel err in local frame
 
-      if (m_local_frame) {
-        m_p_error_vec = m_p_error.toVector();
-        m_v_error =  m_wMl.actInv(m_v_ref) - v_frame;  // vel err in local frame
-
-        // desired acc in local frame
-        m_a_des = m_Kp.cwiseProduct(m_p_error_vec)
-                  + m_Kd.cwiseProduct(m_v_error.toVector())
-                  + m_wMl.actInv(m_a_ref).toVector();
-      } /*else {
-        m_p_error_vec = m_wMl.toActionMatrix() *   // pos err in local world-oriented frame
-            m_p_error.toVector();
-
-        // cout<<"m_p_error_vec="<<m_p_error_vec.head<3>().transpose()<<endl;
-        // cout<<"oMi-m_M_ref  ="<<-(oMi.translation()-m_M_ref.translation()).transpose()<<endl;
-
-        m_v_error = m_v_ref - m_wMl.act(v_frame);  // vel err in local world-oriented frame
-
-        m_drift = m_wMl.act(m_drift);
-
-        // desired acc in local world-oriented frame
-        m_a_des = m_Kp.cwiseProduct(m_p_error_vec)
-                  + m_Kd.cwiseProduct(m_v_error.toVector())
-                  + m_a_ref.toVector();
-
-        // Use an explicit temporary `m_J_rotated` here to avoid allocations.
-        m_J_rotated.noalias() = m_wMl.toActionMatrix() * m_J;
-        m_J = m_J_rotated;
-      }*/
+      // desired acc in local frame
+      m_a_des = m_Kp.cwiseProduct(m_p_error_vec)
+                + m_Kd.cwiseProduct(m_v_error.toVector())
+                + m_wMl.actInv(m_a_ref).toVector();
 
       m_v_error_vec = m_v_error.toVector();
-      m_v_ref_vec = m_v_ref.toVector();
-      m_v = v_frame.toVector();
+      //m_v_ref_vec = m_v_ref.toVector();
+      //m_v = v_frame.toVector();
 
       int idx = 0;
       for (int i = 0; i < 6; i++) {
         if (m_mask(i) != 1.) continue;
 
-        m_constraint.matrix().row(idx) = m_J.row(i);
+        m_constraint.matrix().row(idx) = m_J1.row(i) - m_J2.row(i);
         m_constraint.vector().row(idx) = (m_a_des - m_drift.toVector()).row(i);
         m_a_des_masked(idx)            = m_a_des(i);
         m_drift_masked(idx)            = m_drift.toVector()(i);
