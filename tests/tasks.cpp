@@ -28,6 +28,7 @@
 #include <tsid/tasks/task-joint-posture.hpp>
 #include <tsid/tasks/task-joint-bounds.hpp>
 #include <tsid/tasks/task-joint-posVelAcc-bounds.hpp>
+#include <tsid/tasks/task-frames-equality.hpp>
 
 #include <tsid/trajectories/trajectory-se3.hpp>
 #include <tsid/trajectories/trajectory-euclidian.hpp>
@@ -369,6 +370,76 @@ BOOST_AUTO_TEST_CASE ( test_task_joint_posVelAcc_bounds )
     BOOST_REQUIRE(isFinite(v));
     BOOST_REQUIRE(isFinite(q));
     t += dt;
+  }
+}
+
+BOOST_AUTO_TEST_CASE ( test_task_frames_equality )
+{
+  cout<<"\n\n*********** TEST TASK FRAMES EQUALITY ***********\n";
+  vector<string> package_dirs;
+  package_dirs.push_back(romeo_model_path);
+  string urdfFileName = package_dirs[0] + "/urdf/romeo.urdf";
+  RobotWrapper robot(urdfFileName,
+                     package_dirs,
+                     pinocchio::JointModelFreeFlyer(),
+                     false);
+
+  TaskFramesEquality task("task-se3", robot, "LWristPitch", "RWristPitch");
+
+  VectorXd Kp = VectorXd::Ones(6);
+  VectorXd Kd = 2*VectorXd::Ones(6);
+  task.Kp(Kp);
+  task.Kd(Kd);
+  BOOST_CHECK(task.Kp().isApprox(Kp));
+  BOOST_CHECK(task.Kd().isApprox(Kd));
+
+  pinocchio::SE3 M_ref = pinocchio::SE3::Random();
+  TrajectoryBase *traj = new TrajectorySE3Constant("traj_SE3", M_ref);
+  TrajectorySample sample;
+
+  double t = 0.0;
+  const double dt = 0.001;
+  MatrixXd Jpinv(robot.nv(), 6);
+  double error, error_past=1e100;
+  VectorXd q = neutral(robot.model());
+  VectorXd v = VectorXd::Zero(robot.nv());
+  pinocchio::Data data(robot.model());
+  for(int i=0; i<max_it; i++)
+  {
+    robot.computeAllTerms(data, q, v);
+    sample = traj->computeNext();
+    task.setReference(sample);
+    const ConstraintBase & constraint = task.compute(t, q, v, data);
+    BOOST_CHECK(constraint.rows()==6);
+    BOOST_CHECK(static_cast<tsid::math::Index>(constraint.cols())==static_cast<tsid::math::Index>(robot.nv()));
+    REQUIRE_FINITE(constraint.matrix());
+    BOOST_REQUIRE(isFinite(constraint.vector()));
+
+    pseudoInverse(constraint.matrix(), Jpinv, 1e-4);
+    ConstRefVector dv = Jpinv * constraint.vector();
+    BOOST_REQUIRE(isFinite(Jpinv));
+    BOOST_CHECK(MatrixXd::Identity(6,6).isApprox(constraint.matrix()*Jpinv));
+    if(!isFinite(dv))
+    {
+      cout<< "Jpinv" << Jpinv.transpose() <<endl;
+      cout<< "b" << constraint.vector().transpose() <<endl;
+    }
+    REQUIRE_FINITE(dv.transpose());
+
+    v += dt*dv;
+    q = pinocchio::integrate(robot.model(), q, dt*v);
+    BOOST_REQUIRE(isFinite(v));
+    BOOST_REQUIRE(isFinite(q));
+    t += dt;
+
+    error = task.position_error().norm();
+    BOOST_REQUIRE(isFinite(task.position_error()));
+    BOOST_CHECK(error <= error_past);
+    error_past = error;
+
+    if(i%100==0)
+      cout << "Time "<<t<<"\t Pos error "<<error<<
+              "\t Vel error "<<task.velocity_error().norm()<<endl;
   }
 }
 
