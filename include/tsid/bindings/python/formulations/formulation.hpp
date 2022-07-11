@@ -33,6 +33,7 @@
 #include "tsid/tasks/task-actuation-bounds.hpp"
 #include "tsid/tasks/task-joint-bounds.hpp"
 #include "tsid/tasks/task-angular-momentum-equality.hpp"
+#include "tsid/tasks/task-frames-equality.hpp"
 
 
 namespace tsid
@@ -61,6 +62,7 @@ namespace tsid
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_Joint, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_JointBounds, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_AM, bp::args("task", "weight", "priorityLevel", "transition duration"))
+        .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_FramesEquality, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addForceTask", &InvDynPythonVisitor::addForceTask_COP, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addActuationTask", &InvDynPythonVisitor::addActuationTask_Bounds, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("updateTaskWeight", &InvDynPythonVisitor::updateTaskWeight, bp::args("task_name", "weight"))
@@ -91,6 +93,9 @@ namespace tsid
       static bool addMotionTask_SE3(T & self, tasks::TaskSE3Equality & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addMotionTask(task, weight, priorityLevel, transition_duration);
       }
+      static bool addMotionTask_FramesEquality(T & self, tasks::TaskFramesEquality & task, double weight, unsigned int priorityLevel, double transition_duration){
+        return self.addMotionTask(task, weight, priorityLevel, transition_duration);
+      }      
       static bool addMotionTask_COM(T & self, tasks::TaskComEquality & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addMotionTask(task, weight, priorityLevel, transition_duration);
       }

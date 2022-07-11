@@ -393,9 +393,9 @@ BOOST_AUTO_TEST_CASE ( test_task_frames_equality )
   BOOST_CHECK(task.Kp().isApprox(Kp));
   BOOST_CHECK(task.Kd().isApprox(Kd));
 
-  pinocchio::SE3 M_ref = pinocchio::SE3::Random();
-  TrajectoryBase *traj = new TrajectorySE3Constant("traj_SE3", M_ref);
-  TrajectorySample sample;
+  //pinocchio::SE3 M_ref = pinocchio::SE3::Random();
+  //TrajectoryBase *traj = new TrajectorySE3Constant("traj_SE3", M_ref);
+  //TrajectorySample sample;
 
   double t = 0.0;
   const double dt = 0.001;
@@ -407,8 +407,8 @@ BOOST_AUTO_TEST_CASE ( test_task_frames_equality )
   for(int i=0; i<max_it; i++)
   {
     robot.computeAllTerms(data, q, v);
-    sample = traj->computeNext();
-    task.setReference(sample);
+    //sample = traj->computeNext();
+    //task.setReference(sample);
     const ConstraintBase & constraint = task.compute(t, q, v, data);
     BOOST_CHECK(constraint.rows()==6);
     BOOST_CHECK(static_cast<tsid::math::Index>(constraint.cols())==static_cast<tsid::math::Index>(robot.nv()));

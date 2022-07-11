@@ -195,11 +195,13 @@ TSID_DISABLE_WARNING_POP
     {
       SE3 oMi1, oMi2;
       Motion v_frame1, v_frame2;
+      Motion m_drift1, m_drift2;
       m_robot.framePosition(data, m_frame_id1, oMi1);
       m_robot.framePosition(data, m_frame_id2, oMi2);
       m_robot.frameVelocity(data, m_frame_id1, v_frame1);
       m_robot.frameVelocity(data, m_frame_id2, v_frame2);      
-      m_robot.frameClassicAcceleration(data, m_frame_id1, m_drift);
+      m_robot.frameClassicAcceleration(data, m_frame_id1, m_drift1);
+      m_robot.frameClassicAcceleration(data, m_frame_id2, m_drift2);
 
       // @todo Since Jacobian computation is cheaper in world frame
       // we could do all computations in world frame
@@ -217,12 +219,14 @@ TSID_DISABLE_WARNING_POP
 
       // desired acc in local frame
       m_a_des = m_Kp.cwiseProduct(m_p_error_vec)
-                + m_Kd.cwiseProduct(m_v_error.toVector())
-                + m_wMl.actInv(m_a_ref).toVector();
+                + m_Kd.cwiseProduct(m_v_error.toVector());
+                //+ m_wMl.actInv(m_a_ref).toVector();
 
       m_v_error_vec = m_v_error.toVector();
       //m_v_ref_vec = m_v_ref.toVector();
       //m_v = v_frame.toVector();
+
+      m_drift = m_drift1 - m_drift2; // ACtually dunno what to do with drift
 
       int idx = 0;
       for (int i = 0; i < 6; i++) {
