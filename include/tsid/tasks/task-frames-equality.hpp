@@ -129,7 +129,7 @@ namespace tsid
       Motion m_drift;
       Vector m_drift_masked;
       Matrix6x m_J1, m_J2;
-      //Matrix6x m_J_rotated;
+      Matrix6x m_J1_rotated, m_J2_rotated;
       ConstraintEquality m_constraint;
       TrajectorySample m_ref;
       bool m_local_frame;

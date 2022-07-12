@@ -193,9 +193,13 @@ TSID_DISABLE_WARNING_POP
                                                     ConstRefVector ,
                                                     Data & data)
     {
+
+      // Calculating task with formulation: [J1 - J2   0   0] y = [-J1dot*v + J2dot*v]
+
       SE3 oMi1, oMi2;
       Motion v_frame1, v_frame2;
       Motion m_drift1, m_drift2;
+      SE3 m_wMl1, m_wMl2;
       m_robot.framePosition(data, m_frame_id1, oMi1);
       m_robot.framePosition(data, m_frame_id2, oMi2);
       m_robot.frameVelocity(data, m_frame_id1, v_frame1);
@@ -203,30 +207,33 @@ TSID_DISABLE_WARNING_POP
       m_robot.frameClassicAcceleration(data, m_frame_id1, m_drift1);
       m_robot.frameClassicAcceleration(data, m_frame_id2, m_drift2);
 
-      // @todo Since Jacobian computation is cheaper in world frame
-      // we could do all computations in world frame
+      // Transformation from local to world
+      m_wMl1.rotation(oMi1.rotation());   
+      m_wMl2.rotation(oMi2.rotation());     
+
       m_robot.frameJacobianLocal(data, m_frame_id1, m_J1);
       m_robot.frameJacobianLocal(data, m_frame_id2, m_J2);
 
-      // ==== [Sol]: Exchanging ref to frame2 ====
-      //errorInSE3(oMi, m_M_ref, m_p_error);          // pos err in local frame
       errorInSE3(oMi1, oMi2, m_p_error);          // pos err in local frame
 
-      // Always working in local frame
       m_p_error_vec = m_p_error.toVector();
-      //m_v_error =  m_wMl.actInv(m_v_ref) - v_frame;  // vel err in local frame
-      m_v_error =  v_frame2 - v_frame1;  // vel err in local frame
+
+      m_v_error = m_wMl2.act(v_frame2) - m_wMl1.act(v_frame1);  // vel err in world frame
 
       // desired acc in local frame
       m_a_des = m_Kp.cwiseProduct(m_p_error_vec)
                 + m_Kd.cwiseProduct(m_v_error.toVector());
-                //+ m_wMl.actInv(m_a_ref).toVector();
+                //+ m_wMl.actInv(m_a_ref).toVector(); // Assuming that there is no reference accelerations for this "averaged from two links" frame
 
       m_v_error_vec = m_v_error.toVector();
-      //m_v_ref_vec = m_v_ref.toVector();
-      //m_v = v_frame.toVector();
 
-      m_drift = m_drift1 - m_drift2; // ACtually dunno what to do with drift
+      m_drift = (m_wMl1.act(m_drift1) - m_wMl2.act(m_drift2)); // Actually dunno what to do with drift
+
+      m_J1_rotated.noalias() = m_wMl1.toActionMatrix() * m_J1;
+      m_J1 = m_J1_rotated;      
+
+      m_J2_rotated.noalias() = m_wMl2.toActionMatrix() * m_J2;
+      m_J2 = m_J2_rotated;    
 
       int idx = 0;
       for (int i = 0; i < 6; i++) {
