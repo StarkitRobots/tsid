@@ -169,6 +169,10 @@ namespace tsid
                 + m_Kd.cwiseProduct(m_v_error.toVector());
                 //+ m_wMl.actInv(m_a_ref).toVector(); // Assuming that there is no reference accelerations for this "averaged from two links" frame
 
+      //std::cout << "m_p_error_vec=" << m_p_error_vec.transpose() << std::endl;
+      //std::cout << "m_v_error=" << m_v_error.toVector().transpose() << std::endl;
+      //std::cout << "m_a_des=" << m_a_des.transpose() << std::endl;                
+
       m_v_error_vec = m_v_error.toVector();
 
       m_drift = (m_wMl1.act(m_drift1) - m_wMl2.act(m_drift2));
@@ -192,6 +196,8 @@ namespace tsid
 
         idx += 1;
       }
+
+      //std::cout << "m_a_des_masked=" << m_a_des_masked.transpose() << std::endl; 
 
       return m_constraint;
     }

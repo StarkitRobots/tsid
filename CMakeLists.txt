@@ -126,6 +126,7 @@ SET(${PROJECT_NAME}_CONTACTS_HEADERS
   include/tsid/contacts/contact-base.hpp
   include/tsid/contacts/contact-6d.hpp
   include/tsid/contacts/contact-point.hpp
+  include/tsid/contacts/contact-two-frames.hpp
   )
 
 SET(${PROJECT_NAME}_TRAJECTORIES_HEADERS
@@ -223,6 +224,7 @@ SET(${PROJECT_NAME}_CONTACTS_SOURCES
   src/contacts/contact-base.cpp
   src/contacts/contact-6d.cpp
   src/contacts/contact-point.cpp
+  src/contacts/contact-two-frames.cpp
   )
 
 SET(${PROJECT_NAME}_TRAJECTORIES_SOURCES
