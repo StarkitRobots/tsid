@@ -44,20 +44,14 @@ namespace tsid
         cl
         .def(bp::init<std::string, robots::RobotWrapper &, std::string, std::string> ((bp::arg("name"), bp::arg("robot"), bp::arg("framename1"), bp::arg("framename2")), "Default Constructor"))
         .add_property("dim", &TaskFrames::dim, "return dimension size")
-        .def("setReference", &TaskFramesEqualityPythonVisitor::setReference, bp::arg("ref"))
         .add_property("getDesiredAcceleration", bp::make_function(&TaskFramesEqualityPythonVisitor::getDesiredAcceleration, bp::return_value_policy<bp::copy_const_reference>()), "Return Acc_desired")
         .def("getAcceleration", &TaskFramesEqualityPythonVisitor::getAcceleration, bp::arg("dv"))
         .add_property("position_error", bp::make_function(&TaskFramesEqualityPythonVisitor::position_error, bp::return_value_policy<bp::copy_const_reference>()))
         .add_property("velocity_error", bp::make_function(&TaskFramesEqualityPythonVisitor::velocity_error, bp::return_value_policy<bp::copy_const_reference>()))
-        //.add_property("position", bp::make_function(&TaskFramesEqualityPythonVisitor::position, bp::return_value_policy<bp::copy_const_reference>()))
-        //.add_property("velocity", bp::make_function(&TaskFramesEqualityPythonVisitor::velocity, bp::return_value_policy<bp::copy_const_reference>()))
-        //.add_property("position_ref", bp::make_function(&TaskFramesEqualityPythonVisitor::position_ref, bp::return_value_policy<bp::copy_const_reference>()))
-        //.add_property("velocity_ref", bp::make_function(&TaskFramesEqualityPythonVisitor::velocity_ref, bp::return_value_policy<bp::copy_const_reference>()))
         .add_property("Kp", bp::make_function(&TaskFramesEqualityPythonVisitor::Kp, bp::return_value_policy<bp::copy_const_reference>()))
         .add_property("Kd", bp::make_function(&TaskFramesEqualityPythonVisitor::Kd, bp::return_value_policy<bp::copy_const_reference>()))
         .def("setKp", &TaskFramesEqualityPythonVisitor::setKp, bp::arg("Kp"))
         .def("setKd", &TaskFramesEqualityPythonVisitor::setKd, bp::arg("Kd"))
-        .def("useLocalFrame", &TaskFramesEqualityPythonVisitor::useLocalFrame, bp::arg("local_frame"))
         .add_property("mask", bp::make_function(&TaskFramesEqualityPythonVisitor::getMask, bp::return_value_policy<bp::copy_const_reference>()), "Return mask")
         .def("setMask", &TaskFramesEqualityPythonVisitor::setMask, bp::arg("mask"))
         .def("compute", &TaskFramesEqualityPythonVisitor::compute, bp::args("t", "q", "v", "data"))
@@ -80,9 +74,6 @@ namespace tsid
         math::ConstraintEquality cons(self.getConstraint().name(), self.getConstraint().matrix(), self.getConstraint().vector());
         return cons;
       }
-      static void setReference(TaskFrames & self, trajectories::TrajectorySample & ref){
-        self.setReference(ref);
-      }
       static const Eigen::VectorXd & getDesiredAcceleration(const TaskFrames & self){
         return self.getDesiredAcceleration();
       }
@@ -95,18 +86,6 @@ namespace tsid
       static const Eigen::VectorXd & velocity_error(const TaskFrames & self){
         return self.velocity_error();
       }
-      /*static const Eigen::VectorXd & position (const TaskFrames & self){
-        return self.position();
-      }
-      static const Eigen::VectorXd & velocity (const TaskFrames & self){
-        return self.velocity();
-      }
-      static const Eigen::VectorXd & position_ref (const TaskFrames & self){
-        return self.position_ref();
-      }
-      static const Eigen::VectorXd & velocity_ref (const TaskFrames & self){
-        return self.velocity_ref();
-      }*/
       static const Eigen::VectorXd & Kp (TaskFrames & self){
         return self.Kp();
       }
@@ -118,9 +97,6 @@ namespace tsid
       }
       static void setKd (TaskFrames & self, const::Eigen::VectorXd Kv){
         return self.Kd(Kv);
-      }
-      static void useLocalFrame (TaskFrames & self, const bool local_frame) {
-        self.useLocalFrame(local_frame);
       }
       static void getMask (TaskFrames & self) {
         self.getMask();

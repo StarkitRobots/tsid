@@ -35,8 +35,7 @@ namespace tsid
       TaskMotion(name, robot),
       m_frame_name1(frameName1),
       m_frame_name2(frameName2),
-      m_constraint(name, 6, robot.nv()),
-      m_ref(12, 6)
+      m_constraint(name, 6, robot.nv())
     {
       assert(m_robot.model().existFrame(frameName1));
       assert(m_robot.model().existFrame(frameName2));
@@ -45,8 +44,8 @@ namespace tsid
 
       m_v_ref.setZero();
       m_a_ref.setZero();
-      m_M_ref.setIdentity();
-      m_wMl.setIdentity();
+      m_wMl1.setIdentity();
+      m_wMl2.setIdentity();
       m_p_error_vec.setZero(6);
       m_v_error_vec.setZero(6);
       m_p.resize(12);
@@ -58,13 +57,13 @@ namespace tsid
       m_a_des.setZero(6);
       m_J1.setZero(6, robot.nv());
       m_J2.setZero(6, robot.nv());
-      //m_J_rotated.setZero(6, robot.nv());
+      m_J1_rotated.setZero(6, robot.nv());
+      m_J2_rotated.setZero(6, robot.nv());
 
       m_mask.resize(6);
       m_mask.fill(1.);
       setMask(m_mask);
 
-      m_local_frame = true;
     }
 
     void TaskFramesEquality::setMask(math::ConstRefVector mask)
@@ -99,35 +98,6 @@ namespace tsid
       m_Kd = Kd;
     }
 
-    void TaskFramesEquality::setReference(TrajectorySample & ref)
-    {
-      m_ref = ref;
-TSID_DISABLE_WARNING_PUSH
-TSID_DISABLE_WARNING_DEPRECATED
-      assert(ref.pos.size() == 12);
-      m_M_ref.translation( ref.pos.head<3>());
-      m_M_ref.rotation(MapMatrix3(&ref.pos(3), 3, 3));
-TSID_DISABLE_WARNING_POP
-      m_v_ref = Motion(ref.getDerivative());
-      m_a_ref = Motion(ref.getSecondDerivative());
-    }
-
-    void TaskFramesEquality::setReference(const SE3 & ref)
-    {
-      TrajectorySample s(12, 6);
-TSID_DISABLE_WARNING_PUSH
-TSID_DISABLE_WARNING_DEPRECATED
-      tsid::math::SE3ToVector(ref, s.pos);
-TSID_DISABLE_WARNING_POP
-      setReference(s);
-    }
-
-
-    const TrajectorySample & TaskFramesEquality::getReference() const
-    {
-      return m_ref;
-    }
-
     const Vector & TaskFramesEquality::position_error() const
     {
       return m_p_error_masked_vec;
@@ -137,26 +107,6 @@ TSID_DISABLE_WARNING_POP
     {
       return m_v_error_masked_vec;
     }
-  
-    /*const Vector & TaskFramesEquality::position() const
-    {
-      return m_p;
-    }
-
-    const Vector & TaskFramesEquality::velocity() const
-    {
-      return m_v;
-    }
-
-    const Vector & TaskFramesEquality::position_ref() const
-    {
-      return m_p_ref;
-    }
-
-    const Vector & TaskFramesEquality::velocity_ref() const
-    {
-      return m_v_ref_vec;
-    }*/
 
     const Vector & TaskFramesEquality::getDesiredAcceleration() const
     {
@@ -183,11 +133,6 @@ TSID_DISABLE_WARNING_POP
       return m_constraint;
     }
 
-    void TaskFramesEquality::useLocalFrame(bool local_frame)
-    {
-      m_local_frame = local_frame;
-    }
-
     const ConstraintBase & TaskFramesEquality::compute(const double ,
                                                     ConstRefVector ,
                                                     ConstRefVector ,
@@ -199,7 +144,6 @@ TSID_DISABLE_WARNING_POP
       SE3 oMi1, oMi2;
       Motion v_frame1, v_frame2;
       Motion m_drift1, m_drift2;
-      SE3 m_wMl1, m_wMl2;
       m_robot.framePosition(data, m_frame_id1, oMi1);
       m_robot.framePosition(data, m_frame_id2, oMi2);
       m_robot.frameVelocity(data, m_frame_id1, v_frame1);
@@ -227,7 +171,7 @@ TSID_DISABLE_WARNING_POP
 
       m_v_error_vec = m_v_error.toVector();
 
-      m_drift = (m_wMl1.act(m_drift1) - m_wMl2.act(m_drift2)); // Actually dunno what to do with drift
+      m_drift = (m_wMl1.act(m_drift1) - m_wMl2.act(m_drift2));
 
       m_J1_rotated.noalias() = m_wMl1.toActionMatrix() * m_J1;
       m_J1 = m_J1_rotated;      

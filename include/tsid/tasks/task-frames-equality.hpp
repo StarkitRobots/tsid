@@ -58,10 +58,6 @@ namespace tsid
 
       const ConstraintBase & getConstraint() const;
 
-      void setReference(TrajectorySample & ref);
-      void setReference(const SE3 & ref);
-      const TrajectorySample & getReference() const;
-
       /** Return the desired task acceleration (after applying the specified mask).
        *  The value is expressed in local frame is the local_frame flag is true,
        *  otherwise it is expressed in a local world-oriented frame.
@@ -87,11 +83,6 @@ namespace tsid
        *  otherwise it is expressed in a local world-oriented frame.
       */
       const Vector & velocity_error() const;
-
-      /*const Vector & position() const;
-      const Vector & velocity() const;
-      const Vector & position_ref() const;
-      const Vector & velocity_ref() const;*/
 
       const Vector & Kp() const;
       const Vector & Kd() const;
@@ -122,7 +113,7 @@ namespace tsid
       Vector m_p, m_v;
       Vector m_p_ref, m_v_ref_vec;
       Motion m_v_ref, m_a_ref;
-      SE3 m_M_ref, m_wMl;
+      SE3 m_wMl1, m_wMl2;
       Vector m_Kp;
       Vector m_Kd;
       Vector m_a_des, m_a_des_masked;
@@ -131,8 +122,6 @@ namespace tsid
       Matrix6x m_J1, m_J2;
       Matrix6x m_J1_rotated, m_J2_rotated;
       ConstraintEquality m_constraint;
-      TrajectorySample m_ref;
-      bool m_local_frame;
     };
 
   }
