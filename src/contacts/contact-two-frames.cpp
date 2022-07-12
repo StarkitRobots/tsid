@@ -36,7 +36,7 @@ ContactTwoFrames::ContactTwoFrames(const std::string & name,
                      const double maxNormalForce):
   ContactBase(name, robot),
   m_motionTask(name, robot, frameName1, frameName2), // Actual motion task with type TaskFramesEquality
-  m_dummyMotionTask(name, robot, frameName1), // Only to fit the ContactBase class returns, type TaskSE3Equality
+  m_dummyMotionTask(name, robot, frameName1), // Only to fit the ContactBase class returns, type TaskSE3Equality, seems to be needed only by TaskCopEquality
   m_forceInequality(name, 3, 3),
   m_forceRegTask(name, 3, 3),
   m_contactNormal(contactNormal),
@@ -54,7 +54,7 @@ ContactTwoFrames::ContactTwoFrames(const std::string & name,
   updateForceRegularizationTask();
 
   math::Vector motion_mask(6);
-  motion_mask << 1., 1., 1., 0., 0., 0.;
+  motion_mask << 1., 1., 1., 0., 0., 0.; // Emulating rotational joint 
   m_motionTask.setMask(motion_mask);
 }
 
@@ -65,31 +65,10 @@ void ContactTwoFrames::useLocalFrame(bool local_frame)
 
 void ContactTwoFrames::updateForceInequalityConstraints()
 {
-  /*Vector3 t1, t2;
-  const int n_in = 4*1 + 1;
-  const int n_var = 3*1;
-  Matrix B = Matrix::Zero(n_in, n_var);
-  Vector lb = -1e10*Vector::Ones(n_in);
-  Vector ub =  Vector::Zero(n_in);
-  t1 = m_contactNormal.cross(Vector3::UnitX());
-  if(t1.norm()<1e-5)
-    t1 = m_contactNormal.cross(Vector3::UnitY());
-  t2 = m_contactNormal.cross(t1);
-  t1.normalize();
-  t2.normalize();
-
-  B.block<1,3>(0,0) = (-t1 - m_mu*m_contactNormal).transpose();
-  B.block<1,3>(1,0) = (t1 - m_mu*m_contactNormal).transpose();
-  B.block<1,3>(2,0) = (-t2 - m_mu*m_contactNormal).transpose();
-  B.block<1,3>(3,0) = (t2 - m_mu*m_contactNormal).transpose();
-
-  B.block<1,3>(n_in-1,0) = m_contactNormal.transpose();
-  ub(n_in-1)    = m_fMax;
-  lb(n_in-1)    = m_fMin;*/
-
+  // Force "gluing" two frames together can be arbitrary in sign/direction
   Matrix B = Matrix::Identity(3, 3);
-  Vector lb = -100*Vector::Ones(3); 
-  Vector ub = 100*Vector::Ones(3);
+  Vector lb = -1e10*Vector::Ones(3); 
+  Vector ub = 1e10*Vector::Ones(3);
 
   m_forceInequality.setMatrix(B);
   m_forceInequality.setLowerBound(lb);
@@ -109,7 +88,7 @@ const Matrix3x & ContactTwoFrames::getContactPoints() const
 
 void ContactTwoFrames::setRegularizationTaskWeightVector(ConstRefVector & w)
 {
-  //m_weightForceRegTask = w;
+  m_weightForceRegTask = w;
   updateForceRegularizationTask();
 }
 
@@ -251,12 +230,11 @@ double ContactTwoFrames::getMinNormalForce() const { return m_fMin; }
 double ContactTwoFrames::getMaxNormalForce() const { return m_fMax; }
 
 const TaskSE3Equality & ContactTwoFrames::getMotionTask() const { 
-  std::cout << "Returning ContactTwoFrames::m_dummyMotionTask" << std::endl;
+  std::cout << "Warning! Returning emtpy motion task from ContactTwoFrames::m_dummyMotionTask" << std::endl;
   return m_dummyMotionTask; 
 }
 
 const ConstraintBase & ContactTwoFrames::getMotionConstraint() const { 
-  std::cout << "Returning ContactTwoFrames::getMotionConstraint" << std::endl;
   return m_motionTask.getConstraint(); 
 }
 
