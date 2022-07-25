@@ -15,16 +15,16 @@
 // <http://www.gnu.org/licenses/>.
 //
 
-#include "tsid/bindings/python/tasks/task-frames-equality.hpp"
+#include "tsid/bindings/python/tasks/task-two-frames-equality.hpp"
 #include "tsid/bindings/python/tasks/expose-tasks.hpp"
 
 namespace tsid
 {
   namespace python
   {
-    void exposeTaskFramesEquality()
+    void exposeTaskTwoFramesEquality()
     {
-      TaskFramesEqualityPythonVisitor<tsid::tasks::TaskFramesEquality>::expose("TaskFramesEquality");
+      TaskTwoFramesEqualityPythonVisitor<tsid::tasks::TaskTwoFramesEquality>::expose("TaskTwoFramesEquality");
     }
   }
 }

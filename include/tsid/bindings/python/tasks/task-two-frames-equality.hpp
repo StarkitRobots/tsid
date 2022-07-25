@@ -20,7 +20,7 @@
 
 #include "tsid/bindings/python/fwd.hpp"
 
-#include "tsid/tasks/task-frames-equality.hpp"
+#include "tsid/tasks/task-two-frames-equality.hpp"
 #include "tsid/robots/robot-wrapper.hpp"
 #include "tsid/trajectories/trajectory-base.hpp"
 #include "tsid/math/constraint-equality.hpp"
@@ -32,8 +32,8 @@ namespace tsid
     namespace bp = boost::python;
 
     template<typename TaskFrames>
-    struct TaskFramesEqualityPythonVisitor
-    : public boost::python::def_visitor< TaskFramesEqualityPythonVisitor<TaskFrames> >
+    struct TaskTwoFramesEqualityPythonVisitor
+    : public boost::python::def_visitor< TaskTwoFramesEqualityPythonVisitor<TaskFrames> >
     {
 
       template<class PyClass>
@@ -44,21 +44,21 @@ namespace tsid
         cl
         .def(bp::init<std::string, robots::RobotWrapper &, std::string, std::string> ((bp::arg("name"), bp::arg("robot"), bp::arg("framename1"), bp::arg("framename2")), "Default Constructor"))
         .add_property("dim", &TaskFrames::dim, "return dimension size")
-        .add_property("getDesiredAcceleration", bp::make_function(&TaskFramesEqualityPythonVisitor::getDesiredAcceleration, bp::return_value_policy<bp::copy_const_reference>()), "Return Acc_desired")
-        .def("getAcceleration", &TaskFramesEqualityPythonVisitor::getAcceleration, bp::arg("dv"))
-        .add_property("position_error", bp::make_function(&TaskFramesEqualityPythonVisitor::position_error, bp::return_value_policy<bp::copy_const_reference>()))
-        .add_property("velocity_error", bp::make_function(&TaskFramesEqualityPythonVisitor::velocity_error, bp::return_value_policy<bp::copy_const_reference>()))
-        .add_property("Kp", bp::make_function(&TaskFramesEqualityPythonVisitor::Kp, bp::return_value_policy<bp::copy_const_reference>()))
-        .add_property("Kd", bp::make_function(&TaskFramesEqualityPythonVisitor::Kd, bp::return_value_policy<bp::copy_const_reference>()))
-        .def("setKp", &TaskFramesEqualityPythonVisitor::setKp, bp::arg("Kp"))
-        .def("setKd", &TaskFramesEqualityPythonVisitor::setKd, bp::arg("Kd"))
-        .add_property("mask", bp::make_function(&TaskFramesEqualityPythonVisitor::getMask, bp::return_value_policy<bp::copy_const_reference>()), "Return mask")
-        .def("setMask", &TaskFramesEqualityPythonVisitor::setMask, bp::arg("mask"))
-        .def("compute", &TaskFramesEqualityPythonVisitor::compute, bp::args("t", "q", "v", "data"))
-        .def("getConstraint",  &TaskFramesEqualityPythonVisitor::getConstraint)
+        .add_property("getDesiredAcceleration", bp::make_function(&TaskTwoFramesEqualityPythonVisitor::getDesiredAcceleration, bp::return_value_policy<bp::copy_const_reference>()), "Return Acc_desired")
+        .def("getAcceleration", &TaskTwoFramesEqualityPythonVisitor::getAcceleration, bp::arg("dv"))
+        .add_property("position_error", bp::make_function(&TaskTwoFramesEqualityPythonVisitor::position_error, bp::return_value_policy<bp::copy_const_reference>()))
+        .add_property("velocity_error", bp::make_function(&TaskTwoFramesEqualityPythonVisitor::velocity_error, bp::return_value_policy<bp::copy_const_reference>()))
+        .add_property("Kp", bp::make_function(&TaskTwoFramesEqualityPythonVisitor::Kp, bp::return_value_policy<bp::copy_const_reference>()))
+        .add_property("Kd", bp::make_function(&TaskTwoFramesEqualityPythonVisitor::Kd, bp::return_value_policy<bp::copy_const_reference>()))
+        .def("setKp", &TaskTwoFramesEqualityPythonVisitor::setKp, bp::arg("Kp"))
+        .def("setKd", &TaskTwoFramesEqualityPythonVisitor::setKd, bp::arg("Kd"))
+        .add_property("mask", bp::make_function(&TaskTwoFramesEqualityPythonVisitor::getMask, bp::return_value_policy<bp::copy_const_reference>()), "Return mask")
+        .def("setMask", &TaskTwoFramesEqualityPythonVisitor::setMask, bp::arg("mask"))
+        .def("compute", &TaskTwoFramesEqualityPythonVisitor::compute, bp::args("t", "q", "v", "data"))
+        .def("getConstraint",  &TaskTwoFramesEqualityPythonVisitor::getConstraint)
         .add_property("frame_id1", &TaskFrames::frame_id1, "frame id 1 return")
         .add_property("frame_id2", &TaskFrames::frame_id2, "frame id 2 return")
-        .add_property("name", &TaskFramesEqualityPythonVisitor::name)
+        .add_property("name", &TaskTwoFramesEqualityPythonVisitor::name)
         ;
       }
        static std::string name(TaskFrames & self){
@@ -117,7 +117,7 @@ namespace tsid
         bp::class_<TaskFrames>(class_name.c_str(),
                           doc.c_str(),
                           bp::no_init)
-        .def(TaskFramesEqualityPythonVisitor<TaskFrames>());
+        .def(TaskTwoFramesEqualityPythonVisitor<TaskFrames>());
 
       //  bp::register_ptr_to_python< boost::shared_ptr<math::ConstraintBase> >();
       }

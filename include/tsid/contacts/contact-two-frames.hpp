@@ -20,7 +20,7 @@
 
 #include "tsid/contacts/contact-base.hpp"
 #include "tsid/tasks/task-se3-equality.hpp"
-#include "tsid/tasks/task-frames-equality.hpp"
+#include "tsid/tasks/task-two-frames-equality.hpp"
 #include "tsid/math/constraint-inequality.hpp"
 #include "tsid/math/constraint-equality.hpp"
 
@@ -39,7 +39,7 @@ namespace tsid
       typedef math::Vector6 Vector6;
       typedef math::Vector3 Vector3;
       typedef math::Vector Vector;
-      typedef tasks::TaskFramesEquality TaskFramesEquality;
+      typedef tasks::TaskTwoFramesEquality TaskTwoFramesEquality;
       typedef tasks::TaskSE3Equality TaskSE3Equality;
       typedef math::ConstraintInequality ConstraintInequality;
       typedef math::ConstraintEquality ConstraintEquality;
@@ -120,7 +120,7 @@ namespace tsid
       void updateForceRegularizationTask();
       void updateForceGeneratorMatrix();
 
-      TaskFramesEquality m_motionTask;
+      TaskTwoFramesEquality m_motionTask;
       TaskSE3Equality m_dummyMotionTask;
       ConstraintInequality m_forceInequality;
       ConstraintEquality m_forceRegTask;

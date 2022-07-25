@@ -16,7 +16,7 @@
 //
 
 #include "tsid/math/utils.hpp"
-#include "tsid/tasks/task-frames-equality.hpp"
+#include "tsid/tasks/task-two-frames-equality.hpp"
 #include "tsid/robots/robot-wrapper.hpp"
 
 namespace tsid
@@ -28,7 +28,7 @@ namespace tsid
     using namespace trajectories;
     using namespace pinocchio;
 
-    TaskFramesEquality::TaskFramesEquality(const std::string & name,
+    TaskTwoFramesEquality::TaskTwoFramesEquality(const std::string & name,
                                      RobotWrapper & robot,
                                      const std::string & frameName1,
                                      const std::string & frameName2):
@@ -66,7 +66,7 @@ namespace tsid
 
     }
 
-    void TaskFramesEquality::setMask(math::ConstRefVector mask)
+    void TaskTwoFramesEquality::setMask(math::ConstRefVector mask)
     {
       TaskMotion::setMask(mask);
       int n = dim();
@@ -77,63 +77,63 @@ namespace tsid
       m_a_des_masked.resize(n);
     }
 
-    int TaskFramesEquality::dim() const
+    int TaskTwoFramesEquality::dim() const
     {
       return (int)m_mask.sum();
     }
 
-    const Vector & TaskFramesEquality::Kp() const { return m_Kp; }
+    const Vector & TaskTwoFramesEquality::Kp() const { return m_Kp; }
 
-    const Vector & TaskFramesEquality::Kd() const { return m_Kd; }
+    const Vector & TaskTwoFramesEquality::Kd() const { return m_Kd; }
 
-    void TaskFramesEquality::Kp(ConstRefVector Kp)
+    void TaskTwoFramesEquality::Kp(ConstRefVector Kp)
     {
       assert(Kp.size()==6);
       m_Kp = Kp;
     }
 
-    void TaskFramesEquality::Kd(ConstRefVector Kd)
+    void TaskTwoFramesEquality::Kd(ConstRefVector Kd)
     {
       assert(Kd.size()==6);
       m_Kd = Kd;
     }
 
-    const Vector & TaskFramesEquality::position_error() const
+    const Vector & TaskTwoFramesEquality::position_error() const
     {
       return m_p_error_masked_vec;
     }
 
-    const Vector & TaskFramesEquality::velocity_error() const
+    const Vector & TaskTwoFramesEquality::velocity_error() const
     {
       return m_v_error_masked_vec;
     }
 
-    const Vector & TaskFramesEquality::getDesiredAcceleration() const
+    const Vector & TaskTwoFramesEquality::getDesiredAcceleration() const
     {
       return m_a_des_masked;
     }
 
-    Vector TaskFramesEquality::getAcceleration(ConstRefVector dv) const
+    Vector TaskTwoFramesEquality::getAcceleration(ConstRefVector dv) const
     {
       return m_constraint.matrix()*dv + m_drift_masked;
     }
 
-    Index TaskFramesEquality::frame_id1() const
+    Index TaskTwoFramesEquality::frame_id1() const
     {
       return m_frame_id1;
     }
 
-    Index TaskFramesEquality::frame_id2() const
+    Index TaskTwoFramesEquality::frame_id2() const
     {
       return m_frame_id2;
     }    
 
-    const ConstraintBase & TaskFramesEquality::getConstraint() const
+    const ConstraintBase & TaskTwoFramesEquality::getConstraint() const
     {
       return m_constraint;
     }
 
-    const ConstraintBase & TaskFramesEquality::compute(const double ,
+    const ConstraintBase & TaskTwoFramesEquality::compute(const double ,
                                                     ConstRefVector ,
                                                     ConstRefVector ,
                                                     Data & data)

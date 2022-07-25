@@ -30,7 +30,7 @@ namespace tsid
   namespace tasks
   {
 
-    class TaskFramesEquality : public TaskMotion
+    class TaskTwoFramesEquality : public TaskMotion
     {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -44,7 +44,7 @@ namespace tsid
       typedef pinocchio::Motion Motion;
       typedef pinocchio::SE3 SE3;
 
-      TaskFramesEquality(const std::string & name,
+      TaskTwoFramesEquality(const std::string & name,
                       RobotWrapper & robot,
                       const std::string & frameName1,
                       const std::string & frameName2);

@@ -28,7 +28,7 @@
 #include <tsid/tasks/task-joint-posture.hpp>
 #include <tsid/tasks/task-joint-bounds.hpp>
 #include <tsid/tasks/task-joint-posVelAcc-bounds.hpp>
-#include <tsid/tasks/task-frames-equality.hpp>
+#include <tsid/tasks/task-two-frames-equality.hpp>
 
 #include <tsid/trajectories/trajectory-se3.hpp>
 #include <tsid/trajectories/trajectory-euclidian.hpp>
@@ -384,7 +384,7 @@ BOOST_AUTO_TEST_CASE ( test_task_frames_equality )
                      pinocchio::JointModelFreeFlyer(),
                      false);
 
-  TaskFramesEquality task("task-se3", robot, "LWristPitch", "RWristPitch");
+  TaskTwoFramesEquality task("task-se3", robot, "LWristPitch", "RWristPitch");
 
   VectorXd Kp = VectorXd::Ones(6);
   VectorXd Kd = 2*VectorXd::Ones(6);

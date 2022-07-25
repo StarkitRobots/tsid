@@ -35,7 +35,7 @@ ContactTwoFrames::ContactTwoFrames(const std::string & name,
                      const double minNormalForce,
                      const double maxNormalForce):
   ContactBase(name, robot),
-  m_motionTask(name, robot, frameName1, frameName2), // Actual motion task with type TaskFramesEquality
+  m_motionTask(name, robot, frameName1, frameName2), // Actual motion task with type TaskTwoFramesEquality
   m_dummyMotionTask(name, robot, frameName1), // Only to fit the ContactBase class returns, type TaskSE3Equality, seems to be needed only by TaskCopEquality
   m_forceInequality(name, 3, 3),
   m_forceRegTask(name, 3, 3),

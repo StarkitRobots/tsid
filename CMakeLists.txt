@@ -118,7 +118,7 @@ SET(${PROJECT_NAME}_TASKS_HEADERS
   include/tsid/tasks/task-joint-posVelAcc-bounds.hpp
   include/tsid/tasks/task-capture-point-inequality.hpp
   include/tsid/tasks/task-angular-momentum-equality.hpp
-  include/tsid/tasks/task-frames-equality.hpp
+  include/tsid/tasks/task-two-frames-equality.hpp
   )
 
 SET(${PROJECT_NAME}_CONTACTS_HEADERS
@@ -217,7 +217,7 @@ SET(${PROJECT_NAME}_TASKS_SOURCES
   src/tasks/task-motion.cpp
   src/tasks/task-se3-equality.cpp
   src/tasks/task-angular-momentum-equality.cpp
-  src/tasks/task-frames-equality.cpp
+  src/tasks/task-two-frames-equality.cpp
   )
 
 SET(${PROJECT_NAME}_CONTACTS_SOURCES
