@@ -151,20 +151,20 @@ namespace tsid
       m_robot.frameClassicAcceleration(data, m_frame_id1, m_drift1);
       m_robot.frameClassicAcceleration(data, m_frame_id2, m_drift2);
 
-      // Transformation from local to world
+      // Transformations from local to world
       m_wMl1.rotation(oMi1.rotation());   
       m_wMl2.rotation(oMi2.rotation());     
 
       m_robot.frameJacobianLocal(data, m_frame_id1, m_J1);
       m_robot.frameJacobianLocal(data, m_frame_id2, m_J2);
 
-      errorInSE3(oMi1, oMi2, m_p_error);          // pos err in local frame
-
-      m_p_error_vec = m_p_error.toVector();
+      // Doing all calculations in world frame
+      errorInSE3(oMi1, oMi2, m_p_error);          // pos err in local (=rotated) oMi1 frame
+      m_p_error_vec = m_wMl1.toActionMatrix() * m_p_error.toVector(); // pos err in world frame
 
       m_v_error = m_wMl2.act(v_frame2) - m_wMl1.act(v_frame1);  // vel err in world frame
 
-      // desired acc in local frame
+      // desired acc in world frame
       m_a_des = m_Kp.cwiseProduct(m_p_error_vec)
                 + m_Kd.cwiseProduct(m_v_error.toVector());
                 //+ m_wMl.actInv(m_a_ref).toVector(); // Assuming that there is no reference accelerations for this "averaged from two links" frame
@@ -196,9 +196,7 @@ namespace tsid
 
         idx += 1;
       }
-
-      //std::cout << "m_a_des_masked=" << m_a_des_masked.transpose() << std::endl; 
-
+      
       return m_constraint;
     }
   }
