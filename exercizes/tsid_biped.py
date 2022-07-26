@@ -121,11 +121,11 @@ class TsidBiped:
         self.trajPosture = tsid.TrajectoryEuclidianConstant("traj_joint", q_ref)
         postureTask.setReference(self.trajPosture.computeNext())
 
-        # Testing taskFramesEquality
-        self.framesEqualityTask = tsid.TaskFramesEquality("task-frames-equality", robot, "arm_left_7_link", "arm_right_7_link")
-        self.framesEqualityTask.setKp(10 * np.ones(6))
-        self.framesEqualityTask.setKd(2.0 * np.sqrt(10) * np.ones(6))
-        self.framesEqualityTask.setMask(np.array([1, 0, 0, 0, 0, 0]))
+        # Testing taskTwoFramesEquality
+        self.framesEqualityTask = tsid.TaskTwoFramesEquality("task-frames-equality", robot, "arm_left_7_link", "arm_right_7_link")
+        self.framesEqualityTask.setKp(250 * np.ones(6))
+        self.framesEqualityTask.setKd(2.0 * np.sqrt(250) * np.ones(6))
+        self.framesEqualityTask.setMask(np.array([1, 1, 1, 0, 0, 0]))
         formulation.addMotionTask(self.framesEqualityTask, 1.0, 1, 0.0)
 
 
