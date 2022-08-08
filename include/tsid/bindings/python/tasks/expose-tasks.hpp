@@ -23,6 +23,7 @@
 #include "tsid/bindings/python/tasks/task-se3-equality.hpp"
 #include "tsid/bindings/python/tasks/task-joint-posture.hpp"
 #include "tsid/bindings/python/tasks/task-actuation-bounds.hpp"
+#include "tsid/bindings/python/tasks/task-actuation-equality.hpp"
 #include "tsid/bindings/python/tasks/task-joint-bounds.hpp"
 #include "tsid/bindings/python/tasks/task-am-equality.hpp"
 #include "tsid/bindings/python/tasks/task-two-frames-equality.hpp"
@@ -37,6 +38,7 @@ namespace tsid
     void exposeTaskSE3Equality();
     void exposeTaskJointPosture();
     void exposeTaskActuationBounds();
+    void exposeTaskActuationEquality();    
     void exposeTaskJointBounds();
     void exposeTaskAMEquality();
     void exposeTaskTwoFramesEquality();
@@ -48,6 +50,7 @@ namespace tsid
       exposeTaskSE3Equality();
       exposeTaskJointPosture();
       exposeTaskActuationBounds();
+      exposeTaskActuationEquality();      
       exposeTaskJointBounds();
       exposeTaskAMEquality();
       exposeTaskTwoFramesEquality();

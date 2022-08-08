@@ -67,8 +67,11 @@ void ContactTwoFrames::updateForceInequalityConstraints()
 {
   // Force "gluing" two frames together can be arbitrary in sign/direction
   Matrix B = Matrix::Identity(3, 3);
-  Vector lb = -1e10*Vector::Ones(3); 
-  Vector ub = 1e10*Vector::Ones(3);
+  //Vector lb = -1e10*Vector::Ones(3); 
+  //Vector ub = 1e10*Vector::Ones(3);
+
+  Vector lb = m_fMin*Vector::Ones(3); 
+  Vector ub = m_fMax*Vector::Ones(3);
 
   m_forceInequality.setMatrix(B);
   m_forceInequality.setLowerBound(lb);
