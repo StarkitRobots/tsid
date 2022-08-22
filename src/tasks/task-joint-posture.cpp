@@ -155,6 +155,8 @@ namespace tsid
                                                     ConstRefVector v,
                                                     Data & )
     {
+      //std::cout << "TaskJointPosture: " << q.transpose() << std::endl;
+
       m_ref_q_augmented.tail(m_robot.nq_actuated()) = m_ref.getValue();
 
       // Compute errors
