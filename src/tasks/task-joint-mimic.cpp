@@ -27,6 +27,8 @@ namespace tsid
     using namespace trajectories;
     using namespace pinocchio;
 
+    #define DIM 1
+
     TaskJointMimic::TaskJointMimic( const std::string & name,
                                     RobotWrapper & robot,
                                     const std::string & slaveJointName,
@@ -36,7 +38,7 @@ namespace tsid
       m_ref(robot.nq_actuated(), robot.na()),
       //m_constraint(name, robot.na(), robot.nv())
       //m_constraint(name, 1, 1)
-      m_constraint(name, 1, robot.nv())
+      m_constraint(name, DIM, robot.nv())
       
     {
       assert(m_robot.model().existJoint(slaveJointName));
@@ -44,10 +46,10 @@ namespace tsid
 
       m_q_master = pinocchio::neutral(robot.model());
       m_q_slave = pinocchio::neutral(robot.model());
-      m_Kp.setZero(1);
-      m_Kd.setZero(1);
-      m_p_error.resize(1);   
-      m_v_error.resize(1);    
+      m_Kp.setZero(DIM);
+      m_Kd.setZero(DIM);
+      m_p_error.resize(DIM);   
+      m_v_error.resize(DIM);    
       m_jointIndexSlave = robot.model().getJointId(slaveJointName);
       m_jointIndexMaster  = robot.model().getJointId(masterJointName);  
       m_direction = direction;
@@ -55,14 +57,13 @@ namespace tsid
       //m[m_jointIndex1+6-2] = 1;
       //m[m_jointIndex2+6-2] = 1;
       //setMask(m);
-      Matrix S = Matrix::Zero(1, m_robot.nv());
+      Matrix S = Matrix::Zero(DIM, m_robot.nv());
       S(0,m_robot.nv()-m_robot.na()+(m_jointIndexSlave-2)) = 1.0; // Slave joint
-      //S(1,m_robot.nv()-m_robot.na()+(m_jointIndex2-2)) = 1.0; // Master joint
+      //S(1,m_robot.nv()-m_robot.na()+(m_jointIndexMaster-2)) = 1.0; // Master joint
       m_constraint.setMatrix(S);  
       std::cout << "m_jointIndexSlave=" << m_jointIndexSlave << std::endl;      
       std::cout << "m_jointIndexMaster=" << m_jointIndexMaster << std::endl;
       std::cout << "S(mimic)=" << std::endl << S << std::endl;
-      std::cout << "m_ref_q_augmented=" << std::endl << m_ref_q_augmented.transpose() << std::endl;
     }
 
     const Vector & TaskJointMimic::mask() const
@@ -100,7 +101,7 @@ namespace tsid
     int TaskJointMimic::dim() const
     {
       //return (int)m_mask.sum();
-      return 1;
+      return DIM;
     }
 
     const Vector & TaskJointMimic::Kp(){ return m_Kp; }
@@ -232,11 +233,29 @@ namespace tsid
                   - m_Kd.cwiseProduct(m_v_error);
         
         //std::cout << "m_p_error=" << m_p_error << std::endl;
-        std::cout << m_direction << ": q_slave=" << q[nun+m_jointIndexSlave-1] << ", q_master=" << q[nun+m_jointIndexMaster-1] <<", m_a_des=" << m_a_des << std::endl;         
+        //std::cout << m_direction << ": q_slave=" << q[nun+m_jointIndexSlave-1] << ", q_master=" << q[nun+m_jointIndexMaster-1] <<", m_a_des=" << m_a_des << std::endl;         
         //std::cout << q << std::endl;
         m_constraint.vector() = m_a_des;        
-
       }
+
+      if(0) {
+        // Same rank joint mimic - both joints will try to reach the position computed as middle point between them 
+        int nun = m_robot.nv()-m_robot.na();
+        double p_average = (q[nun+m_jointIndexSlave-1] + q[nun+m_jointIndexMaster-1]) / 2;
+        double v_average = (v[nun+m_jointIndexSlave-2] + v[nun+m_jointIndexMaster-2]) / 2;
+        m_p_error[0] = q[nun+m_jointIndexSlave-1] - p_average;
+        m_p_error[1] = q[nun+m_jointIndexMaster-1] - p_average;
+        m_v_error[0] = v[nun+m_jointIndexSlave-2] - v_average;
+        m_v_error[1] = v[nun+m_jointIndexMaster-2] - v_average;
+        
+        m_a_des = - m_Kp.cwiseProduct(m_p_error)
+                  - m_Kd.cwiseProduct(m_v_error);
+        
+        //std::cout << "m_a_des=" << m_a_des.transpose() << std::endl;
+        //std::cout << m_direction << ": q_slave=" << q[nun+m_jointIndexSlave-1] << ", q_master=" << q[nun+m_jointIndexMaster-1] <<", m_a_des=" << m_a_des << std::endl;         
+        //std::cout << q << std::endl;
+        m_constraint.vector() = m_a_des;        
+      }      
       
       return m_constraint;
     }
