@@ -27,6 +27,7 @@
 #include "tsid/bindings/python/tasks/task-joint-bounds.hpp"
 #include "tsid/bindings/python/tasks/task-am-equality.hpp"
 #include "tsid/bindings/python/tasks/task-two-frames-equality.hpp"
+#include "tsid/bindings/python/tasks/task-com-in-frame-equality.hpp"
 
 
 namespace tsid
@@ -42,6 +43,7 @@ namespace tsid
     void exposeTaskJointBounds();
     void exposeTaskAMEquality();
     void exposeTaskTwoFramesEquality();
+    void exposeTaskComInFrameEquality();
 
     inline void exposeTasks()
     {
@@ -54,6 +56,7 @@ namespace tsid
       exposeTaskJointBounds();
       exposeTaskAMEquality();
       exposeTaskTwoFramesEquality();
+      exposeTaskComInFrameEquality();
     }
     
   } // namespace python
