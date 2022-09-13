@@ -53,8 +53,11 @@ ContactTwoFrames::ContactTwoFrames(const std::string & name,
   updateForceInequalityConstraints();
   updateForceRegularizationTask();
 
-  math::Vector motion_mask(6);
-  motion_mask << 1., 1., 1., 0., 0., 0.; // Emulating rotational joint 
+  // This contact has m_forceGenMat as 3x3 identity matrix, so it can be used only for emulating a BALL JOINT between two frames(!)
+  // The forces calculated will have only linear part (rotation will be unconstrained)
+  // So we need to set the appropriate mask for motion task (which can take into account rotation but we  don't need it)
+  math::Vector motion_mask(6);  
+  motion_mask << 1., 1., 1., 0., 0., 0.; 
   m_motionTask.setMask(motion_mask);
 }
 

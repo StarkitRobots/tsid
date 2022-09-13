@@ -58,8 +58,17 @@ namespace tsid
       //m[m_jointIndex2+6-2] = 1;
       //setMask(m);
       Matrix S = Matrix::Zero(DIM, m_robot.nv());
-      S(0,m_robot.nv()-m_robot.na()+(m_jointIndexSlave-2)) = 1.0; // Slave joint
+      //S(0,m_robot.nv()-m_robot.na()+(m_jointIndexSlave-2)) = 1.0; // Slave joint
       //S(1,m_robot.nv()-m_robot.na()+(m_jointIndexMaster-2)) = 1.0; // Master joint
+
+      // We can use only S(ddq) = a_des notation here 
+      // We are trying to do q1=q2 -> dq1 = dq2 -> ddq1 = ddq2 
+      // This can be rewriten to 1*q1 + (-1)*q2 = 0
+      // So we need to use S = [... 1 ... -1 ...] and a_des = 0 
+      S(0,m_robot.nv()-m_robot.na()+(m_jointIndexSlave-2)) = 1.0; // First joint
+      S(0,m_robot.nv()-m_robot.na()+(m_jointIndexMaster-2)) = -1.0; // Second joint
+      m_a_des = Vector::Zero(2); // Zero right side
+      
       m_constraint.setMatrix(S);  
       std::cout << "m_jointIndexSlave=" << m_jointIndexSlave << std::endl;      
       std::cout << "m_jointIndexMaster=" << m_jointIndexMaster << std::endl;
@@ -219,7 +228,7 @@ namespace tsid
         // m_constraint.vector() = m_a_des;                        
       }
 
-      if(1) {
+      if(0) {
         // Slave -> master single joint mimic acceleration (slave joint is following the master. Master will not follow the slave)
         int nun = m_robot.nv()-m_robot.na();
         // m_q_master = q;
@@ -255,7 +264,26 @@ namespace tsid
         //std::cout << m_direction << ": q_slave=" << q[nun+m_jointIndexSlave-1] << ", q_master=" << q[nun+m_jointIndexMaster-1] <<", m_a_des=" << m_a_des << std::endl;         
         //std::cout << q << std::endl;
         m_constraint.vector() = m_a_des;        
-      }      
+      }   
+
+      if(1) {
+        //Direct acceleration error value
+        m_constraint.vector() = m_a_des;                        
+        
+        // int nun = m_robot.nv()-m_robot.na();
+        // m_p_error[1] = q[nun+m_jointIndex1-2] - q[nun+m_jointIndex2-2]; // TODO: 6 is not right for fixed-base robots
+        // m_p_error[0] = q[nun+m_jointIndex2-2] - q[nun+m_jointIndex1-2];
+        // //std::cout << m_jointIndex1 <<", "<< m_jointIndex2 << std::endl;
+        // //std::cout << "TaskJointMimic:" << q << std::endl;
+
+        // m_v_error[1] = v[nun+m_jointIndex1-2] - v[nun+m_jointIndex2-2];
+        // m_v_error[0] = v[nun+m_jointIndex2-2] - v[nun+m_jointIndex1-2];
+        // m_a_des = - m_Kp.cwiseProduct(m_p_error)
+        //           - m_Kd.cwiseProduct(m_v_error);
+
+        // //std::cout << "m_a_des=" << m_a_des.transpose() << std::endl;         
+
+      }         
       
       return m_constraint;
     }
