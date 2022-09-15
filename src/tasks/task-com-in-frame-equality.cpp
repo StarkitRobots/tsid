@@ -32,8 +32,8 @@ namespace tsid
       m_constraint(name, 3, robot.nv()),
       m_frame_name(frameName)
     {
-      assert(m_robot.model().existFrame(frameName));
-      m_frame_id = m_robot.model().getFrameId(frameName);
+      assert(m_robot.model().existFrame(m_frame_name));
+      m_frame_id = m_robot.model().getFrameId(m_frame_name);
       m_Kp.setZero(3);
       m_Kd.setZero(3);
       m_p_error_vec.setZero(3);
@@ -44,6 +44,9 @@ namespace tsid
       m_ref.resize(3);
       m_mask.resize(3);
       m_mask.fill(1.);
+      m_wMl.setIdentity();
+      m_Jframe.setZero(6, robot.nv());
+      m_Jframe_rotated.setZero(6, robot.nv());      
       setMask(m_mask);
     }
 
@@ -141,8 +144,6 @@ namespace tsid
                                                     ConstRefVector ,
                                                     Data & data)
     {
-
-
       SE3 oMi;
       Motion v_frame_local, v_frame_world;
       Motion drift_frame_local;
