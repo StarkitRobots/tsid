@@ -38,6 +38,7 @@
 #include "tsid/tasks/task-two-frames-equality.hpp"
 #include "tsid/tasks/task-joint-mimic.hpp"
 #include "tsid/tasks/task-com-in-frame-equality.hpp"
+#include "tsid/tasks/task-two-frames-mirror.hpp"
 
 
 namespace tsid
@@ -69,6 +70,7 @@ namespace tsid
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_TwoFramesEquality, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_Mimic, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_ComInFrameEquality, bp::args("task", "weight", "priorityLevel", "transition duration"))
+        .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_TwoFramesMirror, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addForceTask", &InvDynPythonVisitor::addForceTask_COP, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addActuationTask", &InvDynPythonVisitor::addActuationTask_Bounds, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addActuationTask", &InvDynPythonVisitor::addActuationTask_Equality, bp::args("task", "weight", "priorityLevel", "transition duration"))
@@ -105,6 +107,9 @@ namespace tsid
       static bool addMotionTask_TwoFramesEquality(T & self, tasks::TaskTwoFramesEquality & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addMotionTask(task, weight, priorityLevel, transition_duration);
       }      
+      static bool addMotionTask_TwoFramesMirror(T & self, tasks::TaskTwoFramesMirror & task, double weight, unsigned int priorityLevel, double transition_duration){
+        return self.addMotionTask(task, weight, priorityLevel, transition_duration);
+      }            
       static bool addMotionTask_COM(T & self, tasks::TaskComEquality & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addMotionTask(task, weight, priorityLevel, transition_duration);
       }

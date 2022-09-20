@@ -29,6 +29,7 @@
 #include "tsid/bindings/python/tasks/task-two-frames-equality.hpp"
 #include "tsid/bindings/python/tasks/task-joint-mimic.hpp"
 #include "tsid/bindings/python/tasks/task-com-in-frame-equality.hpp"
+#include "tsid/bindings/python/tasks/task-two-frames-mirror.hpp"
 
 
 namespace tsid
@@ -46,6 +47,7 @@ namespace tsid
     void exposeTaskTwoFramesEquality();
     void exposeTaskJointMimic();
     void exposeTaskComInFrameEquality();
+    void exposeTaskTwoFramesMirror();
 
     inline void exposeTasks()
     {
@@ -60,6 +62,7 @@ namespace tsid
       exposeTaskTwoFramesEquality();
       exposeTaskJointMimic();
       exposeTaskComInFrameEquality();
+      exposeTaskTwoFramesMirror();
     }
     
   } // namespace python
