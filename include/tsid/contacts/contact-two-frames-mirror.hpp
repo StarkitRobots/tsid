@@ -126,8 +126,8 @@ namespace tsid
       ConstraintInequality m_forceInequality;
       ConstraintEquality m_forceRegTask;
       //Vector3 m_contactNormal;
-      Vector6 m_fRef;
-      Vector6 m_weightForceRegTask;
+      Vector3 m_fRef;
+      Vector3 m_weightForceRegTask;
       //Matrix3x m_contactPoints;
       Vector m_Kp, m_Kd;  // gain vectors to be returned by reference
       double m_mu;

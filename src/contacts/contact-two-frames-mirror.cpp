@@ -38,16 +38,16 @@ ContactTwoFramesMirror::ContactTwoFramesMirror(const std::string & name,
   ContactBase(name, robot),
   m_motionTask(name, robot, frameName1, frameName2, frameNameMiddle), // Actual motion task with type TaskTwoFramesMirror
   m_dummyMotionTask(name, robot, frameName1), // Only to fit the ContactBase class returns, type TaskSE3Equality, seems to be needed only by TaskCopEquality
-  m_forceInequality(name, 6, 6),
-  m_forceRegTask(name, 6, 6),
+  m_forceInequality(name, 3, 3),
+  m_forceRegTask(name, 3, 3),
   //m_contactNormal(contactNormal),
   m_mu(frictionCoefficient),
   m_fMin(minNormalForce),
   m_fMax(maxNormalForce)
 {
-  m_weightForceRegTask << 1, 1, 1, 1, 1, 1;
-  m_forceGenMat.resize(6, 6);
-  m_fRef = Vector6::Zero();
+  m_weightForceRegTask << 1, 1, 1;
+  m_forceGenMat.resize(3, 3);
+  m_fRef = Vector3::Zero();
 
   updateForceGeneratorMatrix();
   updateForceInequalityConstraints();
@@ -66,12 +66,12 @@ void ContactTwoFramesMirror::useLocalFrame(bool local_frame)
 void ContactTwoFramesMirror::updateForceInequalityConstraints()
 {
   // Force "gluing" two frames together can be arbitrary in sign/direction
-  Matrix B = Matrix::Identity(6, 6);
+  Matrix B = Matrix::Identity(3, 3);
   //Vector lb = -1e10*Vector::Ones(3); 
   //Vector ub = 1e10*Vector::Ones(3);
 
-  Vector lb = m_fMin*Vector::Ones(6); 
-  Vector ub = m_fMax*Vector::Ones(6);
+  Vector lb = m_fMin*Vector::Ones(3); 
+  Vector ub = m_fMax*Vector::Ones(3);
 
   m_forceInequality.setMatrix(B);
   m_forceInequality.setLowerBound(lb);
@@ -97,8 +97,8 @@ void ContactTwoFramesMirror::setRegularizationTaskWeightVector(ConstRefVector & 
 
 void ContactTwoFramesMirror::updateForceRegularizationTask()
 {
-  typedef Eigen::Matrix<double,6,6> Matrix6;
-  Matrix6 A = Matrix6::Zero();
+  typedef Eigen::Matrix<double,3,3> Matrix3;
+  Matrix3 A = Matrix3::Zero();
   A.diagonal() = m_weightForceRegTask;
   m_forceRegTask.setMatrix(A);
   m_forceRegTask.setVector(A*m_fRef);
@@ -109,8 +109,7 @@ void ContactTwoFramesMirror:: updateForceGeneratorMatrix()
   m_forceGenMat.setIdentity();
 }
 
-//unsigned int ContactTwoFramesMirror::n_motion() const { return m_motionTask.dim(); }
-unsigned int ContactTwoFramesMirror::n_motion() const { return 3; }
+unsigned int ContactTwoFramesMirror::n_motion() const { return m_motionTask.dim(); }
 unsigned int ContactTwoFramesMirror::n_force() const { return 3; }
 
 const Vector & ContactTwoFramesMirror::Kp()
