@@ -27,6 +27,7 @@
 #include "tsid/contacts/contact-6d.hpp"
 #include "tsid/contacts/contact-point.hpp"
 #include "tsid/contacts/contact-two-frames.hpp"
+#include "tsid/contacts/contact-two-frames-mirror.hpp"
 #include "tsid/tasks/task-joint-posture.hpp"
 #include "tsid/tasks/task-se3-equality.hpp"
 #include "tsid/tasks/task-com-equality.hpp"
@@ -85,6 +86,8 @@ namespace tsid
         .def("addRigidContact", &InvDynPythonVisitor::addRigidContactPointWithPriorityLevel, bp::args("contact", "force_reg_weight", "motion_weight", "priority_level"))
         .def("addRigidContact", &InvDynPythonVisitor::addRigidContactTwoFrames, bp::args("contact", "force_reg_weight"))
         .def("addRigidContact", &InvDynPythonVisitor::addRigidContactTwoFramesWithPriorityLevel, bp::args("contact", "force_reg_weight", "motion_weight", "priority_level"))
+        .def("addRigidContact", &InvDynPythonVisitor::addRigidContactTwoFramesMirror, bp::args("contact", "force_reg_weight"))        
+        .def("addRigidContact", &InvDynPythonVisitor::addRigidContactTwoFramesMirrorWithPriorityLevel, bp::args("contact", "force_reg_weight", "motion_weight", "priority_level"))
         .def("removeTask", &InvDynPythonVisitor::removeTask, bp::args("task_name", "duration"))
         .def("removeRigidContact", &InvDynPythonVisitor::removeRigidContact, bp::args("contact_name", "duration"))
         .def("removeFromHqpData", &InvDynPythonVisitor::removeFromHqpData, bp::args("constraint_name"))
@@ -176,6 +179,15 @@ namespace tsid
                                                         const bool priority_level){
         return self.addRigidContact(contact, force_regularization_weight, motion_weight, priority_level);
       }      
+      static bool addRigidContactTwoFramesMirror(T& self, contacts::ContactTwoFramesMirror & contact, double force_regularization_weight){
+        return self.addRigidContact(contact, force_regularization_weight);
+      }
+      static bool addRigidContactTwoFramesMirrorWithPriorityLevel(T& self, contacts::ContactTwoFramesMirror & contact,
+                                                        double force_regularization_weight,
+                                                        double motion_weight,
+                                                        const bool priority_level){
+        return self.addRigidContact(contact, force_regularization_weight, motion_weight, priority_level);
+      }            
       static bool removeTask(T& self, const std::string & task_name, double transition_duration){
         return self.removeTask(task_name, transition_duration);
       }  
