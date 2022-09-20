@@ -146,9 +146,18 @@ namespace tsid
                                                     Data & data)
     {
 
-      // Calculating task with formulation: [J1 + J2 - 2*JM   0   0] y = [-J1dot*v - J2dot*v + 2*JMdot*v]
+      // Frame f1 and f2 mirrored by fm: f1(q) - fm(q) = fm(q) - f2(q)
+      //                                 f1(q) + f2(q) - 2*fm(q) = 0
+      //                                df(q) = J*dq
+      //                                J1*dq + J2*dq - 2Jm*dq = 0
+      //                                J1*ddq + J1dot*dq + J2*ddq + J2dot*dq - 2Jmddq - 2Jmdot*dq = 0
+      //                                (J1 + J2 - 2JM) ddq = -J1dot*dq - J2dot*dq + 2JMdot*dq
+      //                                                       drift1      drift2      driftM
+      //
+      // Calculating task with matrix form of: [J1 + J2 - 2*JM   0   0] y = [-J1dot*v - J2dot*v + 2*JMdot*v]
 
       SE3 oMi1, oMi2, oMiM;
+      SE3 M_1toM, M_Mto2;
       Motion v_frame1, v_frame2, v_frameM;
       Motion m_drift1, m_drift2, m_driftM;
       m_robot.framePosition(data, m_frame_id1, oMi1);
@@ -170,29 +179,17 @@ namespace tsid
       m_robot.frameJacobianLocal(data, m_frame_id2, m_J2);
       m_robot.frameJacobianLocal(data, m_frame_id_middle, m_JM);
 
-      // Doing all calculations in world frame
-      Motion m_p_error_1toM, m_v_error_1toM;
-      Motion m_p_error_2toM, m_v_error_2toM;
-      // errorInSE3(oMiM, oMi1, m_p_error_1toM); // Motion from oMi1 to oMiM
-      // errorInSE3(oMiM, oMi2, m_p_error_2toM); // Motion from oMi2 to oMiM     
-      // m_p_error = m_p_error_1toM + m_p_error_2toM; 
-      SE3 M_1toM = oMiM.inverse() * oMi1;
-      SE3 M_2toM = oMiM.inverse() * oMi2;
-      errorInSE3(M_2toM.inverse(), M_1toM, m_p_error);
-      //std::cout << m_p_error.angular() << std::endl;
-      m_p_error_vec = m_p_error.toVector(); // pos err in world frame
-      //m_p_error_vec = m_p_error.toVector(); // pos err in world frame
-      //std::cout << m_p_error_vec.transpose() << std::endl;
+      M_1toM = oMiM.inverse() * oMi1;
+      M_Mto2 = oMi2.inverse() * oMiM;
+      errorInSE3(M_Mto2, M_1toM, m_p_error);
+
+      m_p_error_vec = m_p_error.toVector();
 
       m_v_error = - m_wMl2.act(v_frame2) -  m_wMl1.act(v_frame1) + 2.0 * m_wMlM.act(v_frameM);  // vel err in world frame
 
       // desired acc in world frame
       m_a_des = m_Kp.cwiseProduct(m_p_error_vec)
                 + m_Kd.cwiseProduct(m_v_error.toVector());
-
-      //std::cout << "m_p_error_vec=" << m_p_error_vec.transpose() << std::endl;
-      //std::cout << "m_v_error=" << m_v_error.toVector().transpose() << std::endl;
-      //std::cout << "m_a_des=" << m_a_des.transpose() << std::endl;                
 
       m_v_error_vec = m_v_error.toVector();
 
