@@ -47,6 +47,7 @@ namespace tsid
         .add_property("mask", bp::make_function(&TaskActuationEqualityPythonVisitor::getmask, bp::return_value_policy<bp::copy_const_reference>()), "Return mask")
         .def("setMask", &TaskActuationEqualityPythonVisitor::setmask, bp::arg("mask"))
         .def("setReference", &TaskActuationEqualityPythonVisitor::setReference, bp::args("ref"))
+        .def("setWeightVector", &TaskActuationEqualityPythonVisitor::setWeightVector, bp::args("wights"))
         .add_property("getReference", bp::make_function(&TaskActuationEqualityPythonVisitor::getReference, bp::return_value_policy<bp::copy_const_reference>()))
         .add_property("name", &TaskActuationEqualityPythonVisitor::name)
         ;
@@ -67,6 +68,9 @@ namespace tsid
       static void setReference (Task & self, const Eigen::VectorXd ref){
         return self.setReference(ref);
       }
+      static void setWeightVector (Task & self, const Eigen::VectorXd weights){
+        return self.setWeightVector(weights);
+      }      
       static void expose(const std::string & class_name)
       {
         std::string doc = "Task info.";
