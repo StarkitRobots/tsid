@@ -41,7 +41,7 @@ SET(CMAKE_VERBOSE_MAKEFILE TRUE)
 # JRL-cmakemodule setup
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/boost.cmake)
-INCLUDE(cmake/python.cmake)
+#INCLUDE(cmake/python.cmake)
 INCLUDE(cmake/ide.cmake)
 INCLUDE(cmake/apple.cmake)
 
@@ -85,7 +85,8 @@ IF(BUILD_TESTING)
 ENDIF(BUILD_TESTING)
 
 IF(BUILD_PYTHON_INTERFACE)
-  FINDPYTHON()
+  #FINDPYTHON()
+  find_package(Python3 COMPONENTS Interpreter Development NumPy)
   SET(PYWRAP ${PROJECT_NAME}_pywrap)
   ADD_PROJECT_DEPENDENCY(eigenpy REQUIRED)
   SEARCH_FOR_BOOST_PYTHON(REQUIRED)
