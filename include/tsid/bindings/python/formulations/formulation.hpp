@@ -40,6 +40,7 @@
 #include "tsid/tasks/task-joint-mimic.hpp"
 #include "tsid/tasks/task-com-in-frame-equality.hpp"
 #include "tsid/tasks/task-two-frames-mirror.hpp"
+#include "tsid/tasks/task-joint-posVelAcc-bounds.hpp"
 
 
 namespace tsid
@@ -72,6 +73,7 @@ namespace tsid
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_Mimic, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_ComInFrameEquality, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_TwoFramesMirror, bp::args("task", "weight", "priorityLevel", "transition duration"))
+        .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_JointPosVelAccBounds, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addForceTask", &InvDynPythonVisitor::addForceTask_COP, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addActuationTask", &InvDynPythonVisitor::addActuationTask_Bounds, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addActuationTask", &InvDynPythonVisitor::addActuationTask_Equality, bp::args("task", "weight", "priorityLevel", "transition duration"))
@@ -131,6 +133,9 @@ namespace tsid
       static bool addMotionTask_AM(T & self, tasks::TaskAMEquality & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addMotionTask(task, weight, priorityLevel, transition_duration);
       }
+      static bool addMotionTask_JointPosVelAccBounds(T & self, tasks::TaskJointPosVelAccBounds& task, double weight, unsigned int priorityLevel, double transition_duration) {
+        return self.addMotionTask(task, weight, priorityLevel, transition_duration);
+      }      
       static bool addForceTask_COP(T & self, tasks::TaskCopEquality & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addForceTask(task, weight, priorityLevel, transition_duration);
       }

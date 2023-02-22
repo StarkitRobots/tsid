@@ -40,6 +40,6 @@ namespace tsid
       exposeContactTwoFramesMirror();
     }
 
-  } // namespace python
-} // namespace tsid
-#endif // ifndef __tsid_python_expose_contact_hpp__
+}  // namespace python
+}  // namespace tsid
+#endif  // ifndef __tsid_python_expose_contact_hpp__

@@ -25,12 +25,12 @@
 #include "tsid/bindings/python/tasks/task-actuation-bounds.hpp"
 #include "tsid/bindings/python/tasks/task-actuation-equality.hpp"
 #include "tsid/bindings/python/tasks/task-joint-bounds.hpp"
+#include "tsid/bindings/python/tasks/task-joint-posVelAcc-bounds.hpp"
 #include "tsid/bindings/python/tasks/task-am-equality.hpp"
 #include "tsid/bindings/python/tasks/task-two-frames-equality.hpp"
 #include "tsid/bindings/python/tasks/task-joint-mimic.hpp"
 #include "tsid/bindings/python/tasks/task-com-in-frame-equality.hpp"
 #include "tsid/bindings/python/tasks/task-two-frames-mirror.hpp"
-
 
 namespace tsid
 {
@@ -48,6 +48,7 @@ namespace tsid
     void exposeTaskJointMimic();
     void exposeTaskComInFrameEquality();
     void exposeTaskTwoFramesMirror();
+    void exposeTaskJointPosVelAccBounds();
 
     inline void exposeTasks()
     {
@@ -63,6 +64,7 @@ namespace tsid
       exposeTaskJointMimic();
       exposeTaskComInFrameEquality();
       exposeTaskTwoFramesMirror();
+      exposeTaskJointPosVelAccBounds();
     }
     
   } // namespace python
