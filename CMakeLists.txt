@@ -142,6 +142,7 @@ SET(${PROJECT_NAME}_TASKS_HEADERS
   include/tsid/tasks/task-joint-mimic.hpp
   include/tsid/tasks/task-com-in-frame-equality.hpp
   include/tsid/tasks/task-two-frames-mirror.hpp
+  include/tsid/tasks/task-contact-force-equality-point.hpp
   )
 
 SET(${PROJECT_NAME}_CONTACTS_HEADERS
@@ -264,6 +265,7 @@ SET(${PROJECT_NAME}_TASKS_SOURCES
   src/tasks/task-joint-mimic.cpp
   src/tasks/task-com-in-frame-equality.cpp
   src/tasks/task-two-frames-mirror.cpp
+  src/tasks/task-contact-force-equality-point.cpp
   )
 
 SET(${PROJECT_NAME}_CONTACTS_SOURCES

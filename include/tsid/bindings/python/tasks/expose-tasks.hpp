@@ -31,6 +31,8 @@
 #include "tsid/bindings/python/tasks/task-joint-mimic.hpp"
 #include "tsid/bindings/python/tasks/task-com-in-frame-equality.hpp"
 #include "tsid/bindings/python/tasks/task-two-frames-mirror.hpp"
+#include "tsid/bindings/python/tasks/task-contact-force-equality.hpp"
+#include "tsid/bindings/python/tasks/task-contact-force-equality-point.hpp"
 
 namespace tsid
 {
@@ -49,6 +51,8 @@ namespace tsid
     void exposeTaskComInFrameEquality();
     void exposeTaskTwoFramesMirror();
     void exposeTaskJointPosVelAccBounds();
+    void exposeTaskContactForceEquality();
+    void exposeTaskContactForceEqualityPoint();
 
     inline void exposeTasks()
     {
@@ -65,6 +69,8 @@ namespace tsid
       exposeTaskComInFrameEquality();
       exposeTaskTwoFramesMirror();
       exposeTaskJointPosVelAccBounds();
+      exposeTaskContactForceEquality();
+      exposeTaskContactForceEqualityPoint();
     }
     
   } // namespace python

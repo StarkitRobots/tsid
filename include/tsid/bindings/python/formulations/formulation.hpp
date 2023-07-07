@@ -41,6 +41,7 @@
 #include "tsid/tasks/task-com-in-frame-equality.hpp"
 #include "tsid/tasks/task-two-frames-mirror.hpp"
 #include "tsid/tasks/task-joint-posVelAcc-bounds.hpp"
+#include "tsid/tasks/task-contact-force-equality-point.hpp"
 
 
 namespace tsid
@@ -75,6 +76,7 @@ namespace tsid
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_TwoFramesMirror, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_JointPosVelAccBounds, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addForceTask", &InvDynPythonVisitor::addForceTask_COP, bp::args("task", "weight", "priorityLevel", "transition duration"))
+        .def("addForceTask", &InvDynPythonVisitor::addForceTask_ContactForceEqualityPoint, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addActuationTask", &InvDynPythonVisitor::addActuationTask_Bounds, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addActuationTask", &InvDynPythonVisitor::addActuationTask_Equality, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("updateTaskWeight", &InvDynPythonVisitor::updateTaskWeight, bp::args("task_name", "weight"))
@@ -139,6 +141,9 @@ namespace tsid
       static bool addForceTask_COP(T & self, tasks::TaskCopEquality & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addForceTask(task, weight, priorityLevel, transition_duration);
       }
+      static bool addForceTask_ContactForceEqualityPoint(T & self, tasks::TaskContactForceEqualityPoint & task, double weight, unsigned int priorityLevel, double transition_duration){
+        return self.addForceTask(task, weight, priorityLevel, transition_duration);
+      }      
       static bool addActuationTask_Bounds(T & self, tasks::TaskActuationBounds & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addActuationTask(task, weight, priorityLevel, transition_duration);
       }
