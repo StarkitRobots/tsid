@@ -88,6 +88,7 @@ class TaskContactForceEqualityPoint : public TaskContactForce {
   Vector m_Ki;
   double m_dt;
   double m_leak_rate;
+  bool m_use_fext; // Switch if f_ext (measured by external sensor) should be used or not
 };
 
 }  // namespace tasks

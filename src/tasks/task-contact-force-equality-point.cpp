@@ -37,6 +37,7 @@ TaskContactForceEqualityPoint::TaskContactForceEqualityPoint(
   m_dt = dt;
   m_leak_rate = 0.05;
   m_contact_name = m_contact->name();
+  m_use_fext = false; // [Sol] Don't use f_ext by default
 }
 
 int TaskContactForceEqualityPoint::dim() const { return 3; }
@@ -132,16 +133,25 @@ const ConstraintBase& TaskContactForceEqualityPoint::compute(const double,
                                                         Data& /*data*/) {
   auto& M = m_constraint.matrix();
   M = m_contact->getForceGeneratorMatrix();  // 3x3 for point contact
+  //forceGeneratorMatrix is 3x3 identity for ContactPoint
 
-  Vector forceError = m_ref.getValue() - m_fext.getValue();
-  Vector f_ref =
-      m_ref.getValue() + m_Kp.cwiseProduct(forceError) +
-      m_Kd.cwiseProduct(m_ref.getDerivative() - m_fext.getDerivative()) +
-      m_Ki.cwiseProduct(m_forceIntegralError);
+  Vector3 f_ref;
+
+  if(m_use_fext) {
+    // Complex force equality with PID tracking of external (measured by sensor) component
+    Vector forceError = m_ref.getValue() - m_fext.getValue();
+    f_ref =
+        m_ref.getValue() + m_Kp.cwiseProduct(forceError) +
+        m_Kd.cwiseProduct(m_ref.getDerivative() - m_fext.getDerivative()) +
+        m_Ki.cwiseProduct(m_forceIntegralError);
+    m_forceIntegralError +=
+        (forceError - m_leak_rate * m_forceIntegralError) * m_dt;
+  } else { 
+    // Simple direct force equality without external (measured by sensor) component
+    f_ref = m_ref.getValue();
+  }
+
   m_constraint.vector() = f_ref;
-
-  m_forceIntegralError +=
-      (forceError - m_leak_rate * m_forceIntegralError) * m_dt;
 
   return m_constraint;
 }
