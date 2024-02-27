@@ -41,8 +41,8 @@ namespace tsid
       m_constraint(name, DIM, robot.nv())
       
     {
-      assert(m_robot.model().existJoint(slaveJointName));
-      assert(m_robot.model().existJoint(masterJointName));
+      assert(m_robot.model().existJointName(slaveJointName));
+      assert(m_robot.model().existJointName(masterJointName));
 
       m_q_master = pinocchio::neutral(robot.model());
       m_q_slave = pinocchio::neutral(robot.model());

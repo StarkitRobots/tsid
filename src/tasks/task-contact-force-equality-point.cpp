@@ -84,6 +84,7 @@ void TaskContactForceEqualityPoint::setAssociatedContact(
 }
 
 void TaskContactForceEqualityPoint::setReference(TrajectorySample& ref) {
+  //std::cout << "[TaskContactForceEqualityPoint] Got new ref val=" << m_ref.getValue().transpose() <<" der=" << m_ref.getDerivative().transpose() << ", m_use_fext=" << m_use_fext  << std::endl;
   m_ref = ref;
 }
 
@@ -127,9 +128,9 @@ const ConstraintBase& TaskContactForceEqualityPoint::compute(
   return compute(t, q, v, data);
 }
 
-const ConstraintBase& TaskContactForceEqualityPoint::compute(const double,
-                                                        ConstRefVector,
-                                                        ConstRefVector,
+const ConstraintBase& TaskContactForceEqualityPoint::compute(const double t,
+                                                        ConstRefVector q,
+                                                        ConstRefVector v,
                                                         Data& /*data*/) {
   auto& M = m_constraint.matrix();
   M = m_contact->getForceGeneratorMatrix();  // 3x3 for point contact
@@ -149,6 +150,7 @@ const ConstraintBase& TaskContactForceEqualityPoint::compute(const double,
   } else { 
     // Simple direct force equality without external (measured by sensor) component
     f_ref = m_ref.getValue();
+    //std::cout << "[TaskContactForceEqualityPoint] Compute f_ref=" << f_ref.transpose() << ", t=" << t << std::endl;
   }
 
   m_constraint.vector() = f_ref;
